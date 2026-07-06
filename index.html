@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tejiendo el componente pedagógico — PEC Ɨnkal Awá</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#efe7d4;
+    --bg-deep:#152219;
+    --bg-panel:#1b2c21;
+    --bg-panel-2:#213826;
+    --gold:#c89b3c;
+    --clay:#a6512c;
+    --moss:#5c7f5f;
+    --line: rgba(239,231,212,0.14);
+    --serif: 'Fraunces', serif;
+    --sans: 'Work Sans', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg-deep);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.55;
+  }
+  a{color:var(--gold);}
+
+  /* ---------- Thread motif (signature element) ---------- */
+  .thread{
+    height:14px;
+    width:100%;
+    background-image: repeating-linear-gradient(135deg, var(--gold) 0 8px, transparent 8px 16px),
+                       repeating-linear-gradient(45deg, var(--clay) 0 8px, transparent 8px 16px);
+    background-size: 100% 3px, 100% 3px;
+    background-position: 0 0, 0 8px;
+    background-repeat: repeat-x;
+    opacity:.85;
+  }
+
+  /* ---------- Layout ---------- */
+  .shell{ display:flex; min-height:100vh; }
+  nav.rail{
+    width:250px; flex-shrink:0;
+    background:var(--bg-panel);
+    border-right:1px solid var(--line);
+    padding:28px 18px;
+    position:sticky; top:0; height:100vh;
+    overflow-y:auto;
+  }
+  .brand{
+    font-family:var(--serif); font-weight:700; font-size:1.05rem;
+    color:var(--gold); letter-spacing:.02em; margin-bottom:4px;
+  }
+  .brand small{ display:block; font-family:var(--sans); font-weight:500; font-size:.72rem; color:var(--ink); opacity:.6; margin-top:6px; }
+  .steps{ list-style:none; padding:0; margin:26px 0 0; }
+  .steps li + li{ margin-top:4px; }
+  .steps button{
+    all:unset; cursor:pointer; display:flex; align-items:baseline; gap:10px;
+    width:100%; padding:10px 12px; border-radius:8px; font-size:.86rem;
+    color:var(--ink); opacity:.72; transition:.15s;
+  }
+  .steps button .num{ font-family:var(--serif); color:var(--gold); font-size:.78rem; opacity:.9;}
+  .steps button:hover{ background:rgba(200,155,60,0.09); opacity:1; }
+  .steps button.active{ background:rgba(200,155,60,0.16); opacity:1; box-shadow:inset 3px 0 0 var(--gold); }
+
+  main{ flex:1; padding:52px 56px 90px; max-width:920px; }
+  .eyebrow{
+    font-family:var(--sans); text-transform:uppercase; letter-spacing:.14em;
+    font-size:.72rem; color:var(--moss); font-weight:600; margin-bottom:10px;
+  }
+  h1{ font-family:var(--serif); font-weight:700; font-size:2.3rem; margin:0 0 8px; color:var(--ink); }
+  h2{ font-family:var(--serif); font-weight:600; font-size:1.5rem; color:var(--gold); margin:36px 0 14px; }
+  h3{ font-family:var(--serif); font-weight:600; font-size:1.12rem; color:var(--ink); margin:0 0 8px; }
+  p{ margin:0 0 14px; font-size:.98rem; color:var(--ink); opacity:.92; }
+  .lede{ font-size:1.08rem; opacity:.85; max-width:60ch; }
+  .section{ display:none; animation:fade .35s ease; }
+  .section.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .cardgrid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0 8px;}
+  @media (max-width:760px){ .cardgrid{grid-template-columns:1fr;} main{padding:36px 20px 70px;} nav.rail{position:relative; height:auto; width:100%;} .shell{flex-direction:column;} }
+  .card{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:12px;
+    padding:18px 20px; position:relative; overflow:hidden;
+  }
+  .card::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--clay);
+  }
+  .card.moss::before{ background:var(--moss); }
+  .card.gold::before{ background:var(--gold); }
+
+  .tag{
+    display:inline-block; font-size:.68rem; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--bg-deep); background:var(--gold); padding:3px 9px; border-radius:99px; font-weight:700;
+    margin-bottom:10px;
+  }
+
+  table{ width:100%; border-collapse:collapse; margin:14px 0 26px; font-size:.9rem; }
+  th{ text-align:left; font-family:var(--serif); font-weight:600; color:var(--gold); padding:10px 12px; border-bottom:2px solid var(--line); }
+  td{ padding:12px; border-bottom:1px solid var(--line); vertical-align:top; opacity:.92; }
+  tr:hover td{ background:rgba(255,255,255,0.02); }
+
+  .accordion{ border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-bottom:14px; background:var(--bg-panel); }
+  .accordion button.trigger{
+    all:unset; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+    width:100%; padding:16px 20px; font-family:var(--serif); font-size:1.02rem; color:var(--ink);
+  }
+  .accordion .plus{ font-size:1.3rem; color:var(--gold); transition:transform .2s; }
+  .accordion.open .plus{ transform:rotate(45deg); }
+  .accordion .panel{ max-height:0; overflow:hidden; transition:max-height .3s ease; padding:0 20px; }
+  .accordion.open .panel{ max-height:600px; padding:0 20px 18px; }
+  .accordion .panel p{ font-size:.92rem; }
+
+  .aspect{
+    display:grid; grid-template-columns:56px 1fr; gap:16px; padding:18px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .aspect:last-child{ border-bottom:none; }
+  .aspect .n{ font-family:var(--serif); font-size:1.8rem; color:var(--clay); opacity:.85; }
+
+  .refs{ list-style:none; padding:0; }
+  .refs li{ padding:10px 0; border-bottom:1px solid var(--line); font-size:.88rem; opacity:.85; }
+
+  .quote{
+    font-family:var(--serif); font-style:italic; font-size:1.05rem; color:var(--ink);
+    border-left:3px solid var(--gold); padding:6px 0 6px 18px; margin:18px 0; opacity:.9;
+  }
+  .footnote{ font-size:.8rem; opacity:.6; margin-top:40px; border-top:1px solid var(--line); padding-top:16px; }
+  .pill-row{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 4px; }
+  .pill{ font-size:.72rem; padding:4px 10px; border:1px solid var(--line); border-radius:99px; opacity:.75; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="rail">
+    <div class="brand">Diálogo de saberes<small>Fortalecimiento del PEC Ɨnkal Awá — Componente Pedagógico</small></div>
+    <ul class="steps" id="stepList">
+      <li><button data-target="inicio" class="active"><span class="num">00</span> Inicio</button></li>
+      <li><button data-target="marco"><span class="num">01</span> Marco: SEIP y CONTCEPI</button></li>
+      <li><button data-target="perez"><span class="num">02</span> 4 elementos de Pérez (2015)</button></li>
+      <li><button data-target="analisis"><span class="num">03</span> Análisis del PEC Awá</button></li>
+      <li><button data-target="propuesta"><span class="num">04</span> Propuesta al equipo Awá</button></li>
+      <li><button data-target="referencias"><span class="num">05</span> Referencias</button></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <!-- 00 INICIO -->
+    <section class="section active" id="inicio">
+      <div class="eyebrow">Actividad colaborativa · Pedagogía Propia e Intercultural</div>
+      <h1>Tejiendo el componente pedagógico del PEC Ɨnkal Awá</h1>
+      <p class="lede">Un recorrido colaborativo por el Sistema Educativo Indígena Propio, el diálogo de saberes y el Proyecto Educativo Comunitario del pueblo Awá, para llegar a una propuesta de fortalecimiento pedagógico entendida como algo que se vive en toda la comunidad, no solo en la escuela.</p>
+
+      <div class="thread" style="margin:28px 0;"></div>
+
+      <div class="cardgrid">
+        <div class="card gold">
+          <h3>¿Qué van a encontrar aquí?</h3>
+          <p>Cuatro paradas: el marco normativo del SEIP, los cuatro elementos que propone Pérez (2015) para un modelo pedagógico indígena, el contraste de esos elementos con el PEC Ɨnkal Awá – UNIPA (2019), y una propuesta final para un encuentro real de fortalecimiento del PEC.</p>
+        </div>
+        <div class="card moss">
+          <h3>Cómo usar esta página</h3>
+          <p>Naveguen con el menú de la izquierda. Cada sección tiene tarjetas, tablas o acordeones desplegables — hagan clic para ampliar el contenido. Pensada para presentarse en el encuentro del grupo y también para incrustarse en Google Sites.</p>
+        </div>
+      </div>
+
+      <h2>Equipo colaborativo</h2>
+      <p>[Nombres de los integrantes del grupo] · Curso Pedagogía Propia e Intercultural — 517012 · Universidad Nacional Abierta y a Distancia (UNAD)</p>
+    </section>
+
+    <!-- 01 MARCO SEIP -->
+    <section class="section" id="marco">
+      <div class="eyebrow">Paso 2 · Lectura colaborativa</div>
+      <h1>El SEIP y los tres componentes de la CONTCEPI</h1>
+      <p class="lede">El Sistema Educativo Indígena Propio (SEIP) es la apuesta de los pueblos indígenas de Colombia por administrar su propia educación desde su cosmovisión, su territorio y su autonomía. La Comisión Nacional de Trabajo y Concertación de la Educación para los Pueblos Indígenas (CONTCEPI) construyó, de manera concertada con el Gobierno nacional, la estructura de este sistema alrededor de tres componentes que funcionan de forma articulada.</p>
+
+      <div class="cardgrid">
+        <div class="card gold">
+          <span class="tag">Político–organizativo</span>
+          <p>Recoge el pensamiento propio, la cosmovisión y la autoridad indígena: quién decide, dirige y controla el proceso educativo desde la organización propia de cada pueblo.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Pedagógico</span>
+          <p>Es el que "teje" la sabiduría para la vida: orienta los caminos y las acciones que dinamizan los procesos educativos propios, la identidad cultural, la organización social y la relación armónica con la Madre Tierra. Es el componente en el que se centra esta actividad.</p>
+        </div>
+        <div class="card moss">
+          <span class="tag">Administrativo y de gestión</span>
+          <p>Da soporte operativo al SEIP: la organización de recursos, personal docente propio, infraestructura y financiación necesarios para que la educación propia funcione en el territorio.</p>
+        </div>
+      </div>
+
+      <p style="margin-top:18px;">Los tres componentes no operan por separado: la CONTCEPI insiste en que el SEIP es integral, y que la fuerza política y organizativa es la que legitima y sostiene lo pedagógico, mientras que lo administrativo lo hace viable en la práctica.</p>
+    </section>
+
+    <!-- 02 PEREZ -->
+    <section class="section" id="perez">
+      <div class="eyebrow">Paso 2 · Pérez (2015) y Argueta (2012)</div>
+      <h1>Cuatro elementos para un modelo pedagógico propio</h1>
+      <p class="lede">En su artículo "Diálogo de saberes en el sistema de educación indígena propio de Colombia: hermenéutica contra inconmensurabilidad", Carlos Enrique Pérez Orozco sostiene que el SEIP no puede resolverse simplemente sustituyendo un paradigma occidental por otro indígena, porque los saberes de comunidades distintas no compiten entre sí como lo harían dos teorías científicas rivales. Por eso propone una hermenéutica de la apertura: un diálogo que amplía el horizonte de comprensión de los sujetos sin disolver su identidad. De ese planteamiento se desprenden cuatro elementos clave.</p>
+
+      <div id="perezAccordion">
+        <div class="accordion open">
+          <button class="trigger">1 · Apropiación de la escuela <span class="plus">+</span></button>
+          <div class="panel">
+            <p>La escolaridad de origen occidental no se rechaza de tajo: se toma como una herramienta que garantiza el derecho a una educación diferenciada, pero puesta al servicio del proyecto propio del pueblo indígena y no al revés.</p>
+          </div>
+        </div>
+        <div class="accordion">
+          <button class="trigger">2 · El colectivo como sujeto de aprendizaje <span class="plus">+</span></button>
+          <div class="panel">
+            <p>Quien aprende no es el individuo aislado sino la comunidad. El conocimiento se valida a través de la experiencia compartida y de la resolución colectiva de problemas, no de una evaluación individual y descontextualizada.</p>
+          </div>
+        </div>
+        <div class="accordion">
+          <button class="trigger">3 · Aprendizaje holístico de saberes <span class="plus">+</span></button>
+          <div class="panel">
+            <p>Los saberes no se fragmentan en asignaturas separadas: se entienden como un todo integrado, donde la vivencia cotidiana orienta la manera de enseñar y de resolver problemas reales de la comunidad.</p>
+          </div>
+        </div>
+        <div class="accordion">
+          <button class="trigger">4 · Relativismo contextual <span class="plus">+</span></button>
+          <div class="panel">
+            <p>Cada comunidad puede abrirse al cambio y a nuevos conocimientos sin perder su identidad, porque el valor de un saber se juzga en relación con el contexto que lo produjo, no con un único parámetro universal.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote">"El diálogo de saberes parte de una apertura hospitalaria al saber del otro. La ampliación del horizonte hermenéutico transforma a los sujetos, pero no los diluye sustituyendo paradigmas." — idea central de Pérez Orozco (2015)</div>
+
+      <h2>Lo que aporta Argueta (2012)</h2>
+      <p>Arturo Argueta Villamar, en <em>El diálogo de saberes, una utopía realista</em>, refuerza el mismo espíritu desde otro ángulo: cuestiona el monopolio que la ciencia occidental ha tenido históricamente sobre la definición de qué cuenta como conocimiento válido, y plantea que un verdadero diálogo de saberes exige reconocer la legitimidad de otros sistemas de conocimiento, con respeto y disposición genuina a comprender sus razones. Para Argueta, ese diálogo no es ingenuo: es una "utopía realista", algo exigente pero posible si se construyen las condiciones de equidad necesarias para que ningún saber se imponga sobre otro.</p>
+    </section>
+
+    <!-- 03 ANALISIS -->
+    <section class="section" id="analisis">
+      <div class="eyebrow">Paso 3 · Contraste con el PEC Ɨnkal Awá – UNIPA (2019)</div>
+      <h1>¿Cómo aparecen estos elementos en el PEC Awá?</h1>
+      <p class="lede">El Proyecto Educativo Comunitario Ɨnkal Awá, construido por la Unidad Indígena del Pueblo Awá (UNIPA), permite ver los cuatro elementos de Pérez (2015) encarnados en la vida real de una comunidad concreta.</p>
+
+      <table>
+        <tr><th>Elemento (Pérez, 2015)</th><th>Evidencia en el PEC Ɨnkal Awá</th><th>Relación con el modelo de Pérez</th></tr>
+        <tr>
+          <td>Apropiación de la escuela</td>
+          <td>El PEC reconoce la escuela convencional como un espacio necesario, pero la subordina al Mandato Educativo del pueblo Awá (Ɨnkal Awá Sukin Kamtana Pit Parattarit), que orienta cómo y para qué debe impartirse la educación.</td>
+          <td>Consonancia clara: la escuela occidental se conserva, pero deja de ser el centro y pasa a ser un medio al servicio de la Ley de Origen y la identidad Awá.</td>
+        </tr>
+        <tr>
+          <td>El colectivo como sujeto de aprendizaje</td>
+          <td>El PEC ubica a la familia, los mayores y mayoras, los consejeros y la comunidad entera como corresponsables de la formación de niños y jóvenes, más allá del rol del docente escolarizado.</td>
+          <td>Coincide plenamente: el aprendizaje se valida en la vivencia comunitaria (trabajos colectivos, acompañamiento familiar), no en el desempeño individual.</td>
+        </tr>
+        <tr>
+          <td>Aprendizaje holístico de saberes</td>
+          <td>El componente pedagógico del PEC integra territorio, espiritualidad, Buen Vivir, prácticas de cuidado y cosmovisión (los "cuatro mundos" Awá) como un solo tejido de saberes, sin separarlos en asignaturas aisladas.</td>
+          <td>Alta consonancia: el saber no se fragmenta; se vive de forma integrada en la cotidianidad, tal como propone Pérez.</td>
+        </tr>
+        <tr>
+          <td>Relativismo contextual</td>
+          <td>El PEC afirma que la comunidad puede tomar elementos de la educación estatal (currículo, decretos, PAIP) sin perder su identidad, reinterpretándolos desde su propia autonomía territorial.</td>
+          <td>Se relaciona directamente: el pueblo Awá se abre a lo externo sin renunciar a su cosmovisión, exactamente la apertura sin disolución que plantea Pérez.</td>
+        </tr>
+      </table>
+
+      <h2>Hallazgo interpretativo del grupo</h2>
+      <p>Los cuatro elementos de Pérez (2015) no aparecen en el PEC Awá como categorías separadas, sino entretejidos entre sí: la apropiación de la escuela solo tiene sentido porque hay un colectivo que la resignifica, ese colectivo aprende de forma holística porque su territorio y su espiritualidad no se dividen, y todo eso es posible gracias al relativismo contextual que les permite dialogar con el Estado sin asimilarse a él. En ese sentido, el PEC Ɨnkal Awá puede leerse como una aplicación situada y viva de lo que Pérez plantea de forma teórica, y también como una expresión concreta de la "utopía realista" que describe Argueta (2012): un diálogo de saberes que sí está ocurriendo, con sus tensiones y logros, en el territorio Awá.</p>
+    </section>
+
+    <!-- 04 PROPUESTA -->
+    <section class="section" id="propuesta">
+      <div class="eyebrow">Paso 4 · Escenario real de asesoría</div>
+      <h1>Cuatro aspectos para fortalecer el PEC Awá</h1>
+      <p class="lede">Si nuestro equipo de etnoeducadores fuera invitado a un encuentro de revisión del PEC Awá, entendiendo el componente pedagógico como algo transversal a toda la vida y no solo a lo escolar, propondríamos estos cuatro aspectos, sustentados en las lecturas del curso y en el Plan de Vida Awá.</p>
+
+      <div class="aspect">
+        <div class="n">01</div>
+        <div>
+          <h3>La palabra de los mayores como eje pedagógico diario</h3>
+          <p>Fortalecer espacios cotidianos de oralidad, silencio y escucha —no solo eventos puntuales— como lo señala la Revista Luciérnaga (2015) al hablar de la enseñanza de las lenguas indígenas. La vivencialidad que menciona Pérez (2015) se sostiene precisamente en que la palabra de los mayores acompañe la crianza, el trabajo comunitario y la resolución de conflictos, no solo el aula.</p>
+        </div>
+      </div>
+      <div class="aspect">
+        <div class="n">02</div>
+        <div>
+          <h3>El territorio y la familia como aulas vivas del Plan de Vida</h3>
+          <p>Articular explícitamente las actividades pedagógicas del PEC con las metas del Plan de Vida Awá (seguridad alimentaria, cuidado del territorio, salud propia), de modo que aprender no ocurra solo en la escuela sino en la chagra, la minga y la casa. Esto responde al aprendizaje holístico que reclama Pérez (2015) y al diálogo de saberes que defiende Argueta (2012), evitando que el conocimiento se recorte en compartimentos separados de la vida real.</p>
+        </div>
+      </div>
+      <div class="aspect">
+        <div class="n">03</div>
+        <div>
+          <h3>La Ley de Origen y el Buen Vivir como columna transversal</h3>
+          <p>Que cada actividad pedagógica —escolar o no— pueda mostrar con claridad cómo aporta a vivir la Ley de Origen y el Buen Vivir Ɨnkal Awá, incluyendo el papel de la mujer y las prácticas de cuidado desde la primera infancia que ya recoge el propio PEC. Esto sostiene el relativismo contextual de Pérez (2015): la comunidad decide qué tanto y cómo se abre a lo externo, siempre desde su propio referente de vida.</p>
+        </div>
+      </div>
+      <div class="aspect">
+        <div class="n">04</div>
+        <div>
+          <h3>Un currículo flexible que dialogue con la escuela sin subordinarse a ella</h3>
+          <p>Revisar la apropiación de la escolaridad occidental (Pérez, 2015) para asegurar que las exigencias del Decreto 2500 y del PAIP se adapten al calendario y a las prácticas Awá, y no al revés. Esto responde también a lo que Argueta (2012) llama superar el monólogo de la ciencia occidental: un currículo que reconozca la legitimidad del conocimiento Awá con el mismo peso que el conocimiento escolar convencional.</p>
+        </div>
+      </div>
+
+      <div class="thread" style="margin:30px 0 10px;"></div>
+      <p class="footnote">Estos cuatro aspectos están pensados para socializarse y ajustarse con las autoridades y mayores Awá en el encuentro real de revisión del PEC — son una propuesta de apoyo, no una imposición externa al proceso propio de la comunidad.</p>
+    </section>
+
+    <!-- 05 REFERENCIAS -->
+    <section class="section" id="referencias">
+      <div class="eyebrow">Fuentes citadas</div>
+      <h1>Referencias (APA 7.ª ed.)</h1>
+      <ul class="refs">
+        <li>Argueta Villamar, A. (2012). El diálogo de saberes, una utopía realista. <em>Revista de Investigación Educativa</em>, 5(3), 15–29.</li>
+        <li>Comisión Nacional de Trabajo y Concertación de la Educación para los Pueblos Indígenas [CONTCEPI]. (2013). <em>Perfil del Sistema Educativo Indígena Propio – SEIP</em>. Ministerio de Educación Nacional de Colombia.</li>
+        <li>Pérez Orozco, C. E. (2015). Diálogo de saberes en el sistema de educación indígena propio de Colombia: hermenéutica contra inconmensurabilidad. <em>Cuadernos de Filosofía Latinoamericana</em>, 36(113), 61–82.</li>
+        <li>Revista Luciérnaga -Comunicación. (2015, 5 de julio). <em>La oralidad, el silencio, el escuchar y la observación son elementos claves en la enseñanza-aprendizaje de las lenguas indígenas</em> [Video]. YouTube.</li>
+        <li>Unidad Indígena del Pueblo Awá [UNIPA]. (2019). <em>Proyecto Educativo Comunitario – PEC Ɨnkal Awá</em>. UNIPA.</li>
+        <li>Vives Hurtado, M. P. (2016). Modelos pedagógicos y reflexiones para las pedagogías del sur. <em>Boletín Redipe</em>, 5(11), 40–55.</li>
+      </ul>
+      <p class="footnote">Nota del equipo: para el foro y la sustentación, complementen esta síntesis con la lectura completa del SEIP, del PEC Awá y del Plan de Vida Awá, y ajusten las citas textuales a la norma APA 7 según la edición que consulten.</p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('.steps button');
+  const sections = document.querySelectorAll('.section');
+  buttons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      buttons.forEach(b=>b.classList.remove('active'));
+      sections.forEach(s=>s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.target).classList.add('active');
+      document.querySelector('main').scrollTo(0,0);
+      window.scrollTo(0,0);
+    });
+  });
+
+  document.querySelectorAll('.accordion .trigger').forEach(trig=>{
+    trig.addEventListener('click', ()=>{
+      trig.parentElement.classList.toggle('open');
+    });
+  });
+</script>
+
+</body>
+</html>
